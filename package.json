@@ -1,0 +1,9 @@
+{
+  "name": "gridwatch",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev:backend": "npm -w backend run dev"
+  }
+}
