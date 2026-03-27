@@ -24,7 +24,8 @@ That's it. The seed container runs automatically and populates the database with
 ---
 
 ## Architecture
-Here is the flow chart diagram of complete process
+Here is the flow chart diagram of complete process.
+
 <img width="800" height="646" alt="flow" src="https://github.com/user-attachments/assets/8c47aff1-440e-4542-817e-053fe6b85412" />
 
 ```
