@@ -327,5 +327,5 @@ Seeded scenarios include 50 threshold breach sensors, 20 silent sensor candidate
 
 
 Here is the flow chart diagram of complete process
-<img width="784" height="646" alt="flow" src="https://github.com/user-attachments/assets/8c47aff1-440e-4542-817e-053fe6b85412" />
+<img width="800" height="646" alt="flow" src="https://github.com/user-attachments/assets/8c47aff1-440e-4542-817e-053fe6b85412" />
 
