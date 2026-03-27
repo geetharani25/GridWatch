@@ -1,3 +1,14 @@
+## Seed Credentials
+
+| Email | Password | Role | Zones |
+|-------|----------|------|-------|
+| supervisor@gridwatch.test | GridWatch2026! | supervisor | All zones |
+| operator_a@gridwatch.test | GridWatch2026! | operator | Zone A (Northeast Grid) |
+| operator_b@gridwatch.test | GridWatch2026! | operator | Zones B + C |
+
+Seeded scenarios include 50 threshold breach sensors, 20 silent sensor candidates, 10 active suppressions, 5 escalatable critical alerts (opened >5 min ago), 3 acknowledged alerts, and 2 resolved alerts.
+
+
 # GridWatch — Real-Time Infrastructure Anomaly Detection
 
 A full-stack platform that ingests sensor telemetry, detects anomalies in real-time, manages alerts through a structured state machine, and streams status updates to operators via SSE.
@@ -282,25 +293,6 @@ The `rowCount === 0` check after the INSERT is the signal to skip the UPDATE and
 
 ---
 
-## Production Gaps
-
-These items work in this implementation but would need hardening for a real production deployment:
-
-| Gap | What's Missing |
-|-----|----------------|
-| JWT expiry | Tokens are issued without `expiresIn`. Add `expiresIn: '15m'` + refresh token endpoint. |
-| SSE token in URL | Visible in Nginx access logs. Replace with short-lived SSE tokens. |
-| Rate limiting | No rate limiting on `/ingest`. Add `express-rate-limit` keyed on `user_id` or IP. |
-| Ingest auth | Currently any authenticated user can POST to `/ingest`. Add a device credential system or separate API key auth for sensors. |
-| Database connection pooling | `pool.max = 20` is a reasonable default but not tuned for the worker count. Monitor `pg_stat_activity` under load. |
-| Redis persistence | `appendonly yes` in Docker Compose but no backup or replica. The queue and cache are ephemeral — acceptable for events, not for durable data. |
-| Health check endpoint | `/health` returns `{"status":"ok"}` but doesn't check DB/Redis connectivity. Add liveness vs. readiness distinction. |
-| Secrets management | `.env` file at rest. Replace with a secrets manager (Vault, AWS Secrets Manager) before production. |
-| No test suite | The architecture is testable (pure functions for anomaly rules, injectable pool/redis) but no tests were written. Add integration tests that hit a real PostgreSQL container. |
-| Sensor last_seen timezone | `last_seen_at` is updated on ingest and used for pattern absence detection. If ingest is delayed (network partition), the 2-minute threshold may false-positive. Consider a grace period or confirmation before marking silent. |
-
----
-
 ## Benchmark Results
 
 All measurements against the Docker Compose stack on localhost.
@@ -315,15 +307,3 @@ All measurements against the Docker Compose stack on localhost.
 | Escalation (critical open >5min → escalated_at set) | within 15s interval | **≤15s** |
 
 The history endpoint achieves 29ms via the `(sensor_id, timestamp DESC)` index, CTE-based pagination, and a 30-second Redis count cache. The ingest endpoint responds in 88ms because anomaly detection is fully async (enqueue + respond; workers process in the background).
-
----
-
-## Seed Credentials
-
-| Email | Password | Role | Zones |
-|-------|----------|------|-------|
-| supervisor@gridwatch.test | GridWatch2026! | supervisor | All zones |
-| operator_a@gridwatch.test | GridWatch2026! | operator | Zone A (Northeast Grid) |
-| operator_b@gridwatch.test | GridWatch2026! | operator | Zones B + C |
-
-Seeded scenarios include 50 threshold breach sensors, 20 silent sensor candidates, 10 active suppressions, 5 escalatable critical alerts (opened >5 min ago), 3 acknowledged alerts, and 2 resolved alerts.
