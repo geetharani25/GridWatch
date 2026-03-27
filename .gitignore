@@ -28,5 +28,8 @@ npm-debug.log*
 *.suo
 *.sw?
 
+# Claude Code
+.claude/
+
 # Docker
 docker-compose.override.yml
