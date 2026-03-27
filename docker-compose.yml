@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB:       gridwatch
       POSTGRES_USER:     gridwatch
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gridwatch_dev_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/src/db/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
@@ -32,9 +32,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://gridwatch:${POSTGRES_PASSWORD}@postgres:5432/gridwatch
+      DATABASE_URL: postgresql://gridwatch:${POSTGRES_PASSWORD:-gridwatch_dev_password}@postgres:5432/gridwatch
       REDIS_URL:    redis://redis:6379
-      JWT_SECRET:   ${JWT_SECRET}
+      JWT_SECRET:   ${JWT_SECRET:-gridwatch_dev_jwt_secret_32chars_min}
       NODE_ENV:     production
       PORT:         3000
       CORS_ORIGIN:  http://localhost
@@ -48,9 +48,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://gridwatch:${POSTGRES_PASSWORD}@postgres:5432/gridwatch
+      DATABASE_URL: postgresql://gridwatch:${POSTGRES_PASSWORD:-gridwatch_dev_password}@postgres:5432/gridwatch
       REDIS_URL:    redis://redis:6379
-      JWT_SECRET:   ${JWT_SECRET}
+      JWT_SECRET:   ${JWT_SECRET:-gridwatch_dev_jwt_secret_32chars_min}
       NODE_ENV:     production
     depends_on:
       postgres: { condition: service_healthy }

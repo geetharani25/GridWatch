@@ -18,11 +18,10 @@ A full-stack platform that ingests sensor telemetry, detects anomalies in real-t
 ## Quick Start
 
 ```bash
-cp .env.example .env
-# Edit .env: set POSTGRES_PASSWORD and JWT_SECRET to non-default values
-
 docker-compose up --build -d
 # Wait ~30-60s for all services to become healthy
+# Built-in defaults work out of the box.
+# To use custom secrets: cp .env.example .env and edit before running.
 
 # Login: http://localhost
 # supervisor@gridwatch.test / GridWatch2026!   (sees all 1050 sensors)
