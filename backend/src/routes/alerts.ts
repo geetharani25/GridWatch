@@ -8,7 +8,6 @@ import { AlertStatus } from '../types/alert';
 
 const router = Router();
 
-// GET /alerts — paginated, zone-filtered
 router.get('/', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { status, severity, page = '1' } = req.query as Record<string, string>;
@@ -36,7 +35,6 @@ router.get('/', authMiddleware, zoneGuard, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// GET /alerts/:id
 router.get('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { rows } = await pool.query(
@@ -51,7 +49,6 @@ router.get('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// PATCH /alerts/:id — status transition
 router.patch('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { rows } = await pool.query(
@@ -83,7 +80,6 @@ router.patch('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   }
 });
 
-// GET /alerts/:id/transitions — audit log
 router.get('/:id/transitions', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { rows } = await pool.query(

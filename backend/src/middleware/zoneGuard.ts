@@ -6,7 +6,7 @@ export function zoneGuard(req: Request, res: Response, next: NextFunction): void
     return;
   }
   if (req.user.role === 'supervisor') {
-    req.zoneFilter = null; // null = all zones
+    req.zoneFilter = null;
   } else {
     req.zoneFilter = req.user.zones;
     if (req.zoneFilter.length === 0) {

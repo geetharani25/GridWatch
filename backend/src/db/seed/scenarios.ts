@@ -3,7 +3,6 @@ import { SeedSensor } from './sensors';
 import { USER_IDS } from './users';
 
 export async function seedDemoScenarios(pool: Pool, sensors: SeedSensor[]): Promise<void> {
-  // 50 sensors with threshold breach anomalies (voltage spike)
   const breachSensors = sensors.slice(0, 50);
   for (const sensor of breachSensors) {
     const { rows: [anomaly] } = await pool.query(
@@ -31,7 +30,6 @@ export async function seedDemoScenarios(pool: Pool, sensors: SeedSensor[]): Prom
   }
   console.log('  Threshold breach scenarios: 50 sensors');
 
-  // 20 sensors set silent (last_seen_at 3 hours ago)
   const silentSensors = sensors.slice(50, 70);
   for (const sensor of silentSensors) {
     await pool.query(
@@ -41,7 +39,6 @@ export async function seedDemoScenarios(pool: Pool, sensors: SeedSensor[]): Prom
   }
   console.log('  Silent sensor candidates: 20 sensors (will be detected by worker)');
 
-  // 10 sensors with active suppressions
   const suppressedSensors = sensors.slice(70, 80);
   for (const sensor of suppressedSensors) {
     await pool.query(
@@ -52,7 +49,6 @@ export async function seedDemoScenarios(pool: Pool, sensors: SeedSensor[]): Prom
   }
   console.log('  Active suppressions: 10 sensors');
 
-  // 5 critical alerts opened >5 minutes ago (for escalation demo)
   const escalateSensors = sensors.slice(80, 85);
   for (const sensor of escalateSensors) {
     const { rows: [anomaly] } = await pool.query(
@@ -79,7 +75,6 @@ export async function seedDemoScenarios(pool: Pool, sensors: SeedSensor[]): Prom
   }
   console.log('  Escalatable critical alerts: 5 (opened 6 min ago)');
 
-  // 3 acknowledged alerts
   const ackSensors = sensors.slice(85, 88);
   for (const sensor of ackSensors) {
     const { rows: [anomaly] } = await pool.query(
@@ -101,7 +96,6 @@ export async function seedDemoScenarios(pool: Pool, sensors: SeedSensor[]): Prom
   }
   console.log('  Acknowledged alerts: 3');
 
-  // 2 resolved alerts with full transition history
   const resolvedSensors = sensors.slice(88, 90);
   for (const sensor of resolvedSensors) {
     const { rows: [anomaly] } = await pool.query(

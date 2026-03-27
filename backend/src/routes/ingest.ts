@@ -13,12 +13,10 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 
   const { valid, failed } = validateBatch(raw);
-  await bulkInsert(valid); // DURABLE WRITE — await this
-
-  // Respond immediately after durable write
+  await bulkInsert(valid);
   res.json({ accepted: valid.length, failed });
 
-  // Fire-and-forget AFTER response
+  // fire-and-forget after response
   enqueueForProcessing(valid).catch(err => logger.error({ err }, 'Failed to enqueue readings'));
   updateLastSeen(valid).catch(err => logger.error({ err }, 'Failed to update last_seen_at'));
 });

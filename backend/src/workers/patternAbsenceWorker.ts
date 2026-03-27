@@ -15,7 +15,6 @@ async function checkSilentSensors(): Promise<void> {
   `);
 
   for (const sensor of silentSensors) {
-    // Duplicate guard: skip if we created a pattern_absence anomaly in the last 5 min
     const { rows: recent } = await pool.query(`
       SELECT id FROM anomalies
       WHERE sensor_id = $1
@@ -62,5 +61,5 @@ async function checkSilentSensors(): Promise<void> {
 export function startPatternAbsenceWorker(): void {
   logger.info('Pattern absence worker started');
   setInterval(() => checkSilentSensors().catch(err => logger.error({ err }, 'Pattern absence check failed')), 30_000);
-  checkSilentSensors().catch(err => logger.error({ err }, 'Pattern absence check failed')); // run immediately on startup
+  checkSilentSensors().catch(err => logger.error({ err }, 'Pattern absence check failed'));
 }

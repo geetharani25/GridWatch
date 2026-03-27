@@ -3,7 +3,7 @@ import { useSSE } from '../../hooks/useSSE';
 import { useAppStore } from '../../store/useAppStore';
 
 export function AppShell() {
-  useSSE(); // Start SSE connection once, at the shell level
+  useSSE();
   const user = useAppStore(s => s.user);
   const setUser = useAppStore(s => s.setUser);
   const navigate = useNavigate();

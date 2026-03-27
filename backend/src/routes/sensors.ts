@@ -6,7 +6,6 @@ import { getSensorHistory } from '../services/history.service';
 
 const router = Router();
 
-// GET /sensors — zone-filtered list
 router.get('/', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { rows } = await pool.query(
@@ -23,7 +22,6 @@ router.get('/', authMiddleware, zoneGuard, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// GET /sensors/:id
 router.get('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const sensorId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -44,7 +42,6 @@ router.get('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// GET /sensors/:id/history
 router.get('/:id/history', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { from, to, page = '1' } = req.query as Record<string, string>;
@@ -58,10 +55,6 @@ router.get('/:id/history', authMiddleware, zoneGuard, async (req, res, next) => 
       Number(page),
       req.zoneFilter ?? null
     );
-    if (result.readings.length === 0 && Number(page) === 1) {
-      res.status(404).json({ error: 'Sensor not found or no readings in range' });
-      return;
-    }
     res.json(result);
   } catch (err) { next(err); }
 });

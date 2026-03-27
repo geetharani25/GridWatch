@@ -4,18 +4,17 @@ export interface User {
   id:    string;
   email?: string;
   role:  UserRole;
-  zones: string[];   // zone UUIDs; empty array for supervisors (all zones permitted)
+  zones: string[];
 }
 
 export interface JWTPayload {
-  sub:   string;   // user.id
+  sub:   string;
   role:  UserRole;
   zones: string[];
   iat:   number;
   exp:   number;
 }
 
-// Augment express Request
 declare global {
   namespace Express {
     interface Request {

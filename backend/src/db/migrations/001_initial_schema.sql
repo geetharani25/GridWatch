@@ -1,11 +1,5 @@
--- ─────────────────────────────────────────────
--- EXTENSIONS
--- ─────────────────────────────────────────────
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- ─────────────────────────────────────────────
--- TABLE: zones
--- ─────────────────────────────────────────────
 CREATE TABLE zones (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT        NOT NULL UNIQUE,
@@ -13,9 +7,6 @@ CREATE TABLE zones (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ─────────────────────────────────────────────
--- TABLE: users
--- ─────────────────────────────────────────────
 CREATE TABLE users (
   id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   email         TEXT        NOT NULL UNIQUE,
@@ -24,18 +15,12 @@ CREATE TABLE users (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ─────────────────────────────────────────────
--- TABLE: user_zones  (operator → zone assignments)
--- ─────────────────────────────────────────────
 CREATE TABLE user_zones (
   user_id  UUID NOT NULL REFERENCES users(id)  ON DELETE CASCADE,
   zone_id  UUID NOT NULL REFERENCES zones(id)  ON DELETE CASCADE,
   PRIMARY KEY (user_id, zone_id)
 );
 
--- ─────────────────────────────────────────────
--- TABLE: sensors
--- ─────────────────────────────────────────────
 CREATE TABLE sensors (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   zone_id      UUID        NOT NULL REFERENCES zones(id),
@@ -51,9 +36,6 @@ CREATE INDEX idx_sensors_zone_id   ON sensors(zone_id);
 CREATE INDEX idx_sensors_status    ON sensors(status);
 CREATE INDEX idx_sensors_last_seen ON sensors(last_seen_at);
 
--- ─────────────────────────────────────────────
--- TABLE: sensor_configs  (one row per sensor)
--- ─────────────────────────────────────────────
 CREATE TABLE sensor_configs (
   id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   sensor_id           UUID        NOT NULL UNIQUE REFERENCES sensors(id) ON DELETE CASCADE,
@@ -71,9 +53,6 @@ CREATE TABLE sensor_configs (
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ─────────────────────────────────────────────
--- TABLE: readings
--- ─────────────────────────────────────────────
 CREATE TABLE readings (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   sensor_id   UUID        NOT NULL REFERENCES sensors(id),
@@ -88,9 +67,6 @@ CREATE TABLE readings (
 
 CREATE INDEX idx_readings_sensor_ts ON readings(sensor_id, timestamp DESC);
 
--- ─────────────────────────────────────────────
--- TABLE: anomalies
--- ─────────────────────────────────────────────
 CREATE TABLE anomalies (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   sensor_id    UUID        NOT NULL REFERENCES sensors(id),
@@ -102,11 +78,14 @@ CREATE TABLE anomalies (
 );
 
 CREATE INDEX idx_anomalies_sensor_ts  ON anomalies(sensor_id, triggered_at DESC);
+
+-- partial index for pattern absence worker dedup
+CREATE INDEX idx_anomalies_pattern_absence
+  ON anomalies(sensor_id, triggered_at DESC)
+  WHERE rule = 'pattern_absence';
+
 CREATE INDEX idx_anomalies_reading_id ON anomalies(reading_id);
 
--- ─────────────────────────────────────────────
--- TABLE: alerts
--- ─────────────────────────────────────────────
 CREATE TABLE alerts (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   anomaly_id      UUID        NOT NULL UNIQUE REFERENCES anomalies(id),
@@ -126,15 +105,13 @@ CREATE TABLE alerts (
 CREATE INDEX idx_alerts_zone_status_opened
   ON alerts(zone_id, status, opened_at DESC);
 
+-- covers escalation worker scan of unescalated open alerts
 CREATE INDEX idx_alerts_escalation
   ON alerts(status, severity, opened_at)
   WHERE escalated_at IS NULL;
 
-CREATE INDEX idx_alerts_sensor_id ON alerts(sensor_id);
+CREATE INDEX idx_alerts_sensor_status ON alerts(sensor_id, status);
 
--- ─────────────────────────────────────────────
--- TABLE: alert_transitions  (append-only audit log)
--- ─────────────────────────────────────────────
 CREATE TABLE alert_transitions (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   alert_id        UUID        NOT NULL REFERENCES alerts(id),
@@ -149,9 +126,6 @@ CREATE TABLE alert_transitions (
 CREATE INDEX idx_alert_transitions_alert
   ON alert_transitions(alert_id, transitioned_at DESC);
 
--- ─────────────────────────────────────────────
--- TABLE: escalation_log
--- ─────────────────────────────────────────────
 CREATE TABLE escalation_log (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   alert_id     UUID        NOT NULL UNIQUE REFERENCES alerts(id),
@@ -160,9 +134,6 @@ CREATE TABLE escalation_log (
   note         TEXT
 );
 
--- ─────────────────────────────────────────────
--- TABLE: suppressions
--- ─────────────────────────────────────────────
 CREATE TABLE suppressions (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   sensor_id  UUID        NOT NULL REFERENCES sensors(id),

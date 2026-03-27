@@ -12,7 +12,6 @@ interface SensorGridProps {
 export function SensorGrid({ sensors }: SensorGridProps) {
   const parentRef = useRef<HTMLDivElement>(null);
 
-  // Group sensors into rows
   const rows: Array<typeof sensors> = [];
   for (let i = 0; i < sensors.length; i += COLS) {
     rows.push(sensors.slice(i, i + COLS));

@@ -101,6 +101,31 @@ npm run dev              # Vite dev server on :5173 with /api proxy
 
 ---
 
+## Schema
+
+The full schema lives in one file:
+
+```
+backend/src/db/migrations/001_initial_schema.sql
+```
+
+**Docker Compose (automatic):** the file is mounted as `docker-entrypoint-initdb.d/001_schema.sql`, so `docker-compose up` runs it automatically on first start — no manual step needed.
+
+**Manual (psql):** to apply it to an existing PostgreSQL instance from scratch:
+
+```bash
+createdb gridwatch
+psql -d gridwatch -f backend/src/db/migrations/001_initial_schema.sql
+```
+
+Then seed with:
+
+```bash
+cd backend && npm run seed
+```
+
+---
+
 ## Schema Decisions
 
 ### All IDs are UUID, all timestamps are TIMESTAMPTZ
@@ -140,6 +165,20 @@ The most common query pattern is "last N readings for sensor X." A composite ind
 ### `UNIQUE (sensor_id, timestamp)` on readings
 
 Prevents duplicate ingestion of the same reading. The ingest route uses `INSERT ... ON CONFLICT DO NOTHING` (not strictly required in code — the constraint is the real guard).
+
+### `alerts(sensor_id, status)` index
+
+The sensor detail view needs to answer "does this sensor have an open alert?" on every page load. Without this index, every sensor detail request would scan all alerts for that sensor to find open ones.
+
+### Partial index on `anomalies` for pattern absence deduplication
+
+```sql
+CREATE INDEX idx_anomalies_pattern_absence
+  ON anomalies(sensor_id, triggered_at DESC)
+  WHERE rule = 'pattern_absence';
+```
+
+The pattern absence worker runs every 30 seconds and checks whether a `pattern_absence` anomaly was already fired in the last 5 minutes per sensor (to avoid spamming). A partial index filtered to only `pattern_absence` rows is smaller and faster than a full-table index, and matches the exact predicate used in the dedup query.
 
 ### `alert_transitions` is append-only
 

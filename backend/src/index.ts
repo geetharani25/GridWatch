@@ -8,8 +8,8 @@ import { startEscalationWorker } from './workers/escalationWorker';
 import { logger } from './lib/logger';
 
 async function main() {
-  await pool.query('SELECT 1'); // verify DB connection
-  await redis.ping();          // verify Redis connection
+  await pool.query('SELECT 1');
+  await redis.ping();
 
   const app = createApp();
   app.listen(config.PORT, () =>

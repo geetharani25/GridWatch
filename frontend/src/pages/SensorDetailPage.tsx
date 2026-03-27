@@ -17,7 +17,7 @@ const statusClass: Record<string, string> = {
 export default function SensorDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [dateRange] = useState({
-    from: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     to:   new Date().toISOString(),
   });
   const [page, setPage] = useState(1);
@@ -27,7 +27,7 @@ export default function SensorDetailPage() {
     queryFn: () => getSensor(id!),
   });
 
-  const { data: history, isLoading } = useSensorHistory(
+  const { data: history, isLoading, error } = useSensorHistory(
     id!, dateRange.from, dateRange.to, page
   );
 
@@ -57,11 +57,12 @@ export default function SensorDetailPage() {
 
       <div className="bg-white border border-slate-200 rounded-lg p-4">
         <h2 className="text-base font-medium text-slate-700 mb-4">
-          Readings (last 24h)
+          Readings (last 7 days)
           {history && <span className="text-sm font-normal text-slate-400 ml-2">— {history.total} total</span>}
         </h2>
 
         {isLoading && <p className="text-slate-400 text-sm">Loading readings...</p>}
+        {error && <p className="text-red-500 text-sm">Error: {(error as any)?.response?.data?.error ?? (error as any)?.message ?? 'Failed to load readings'}</p>}
         {history && <ReadingsChart readings={history.readings} />}
 
         {history && history.pages > 1 && (

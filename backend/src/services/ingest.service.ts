@@ -38,7 +38,6 @@ export async function enqueueForProcessing(readings: SensorReading[]): Promise<v
     try {
       await redis.rpush('queue:anomaly', msg);
     } catch {
-      // Fallback: pg_notify
       await pool.query("SELECT pg_notify('anomaly_queue', $1)", [msg]);
     }
   }

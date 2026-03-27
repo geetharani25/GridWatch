@@ -1,7 +1,6 @@
 import { AnomalyRecord } from '../types/alert';
 import { SensorConfig } from '../types/sensor';
 
-// Rule A: threshold breach
 export function evaluateRuleA(
   reading: { voltage: number; temperature: number },
   config: SensorConfig
@@ -18,7 +17,6 @@ export function evaluateRuleA(
   return anomalies;
 }
 
-// Rule B: rate-of-change spike
 export function evaluateRuleB(
   reading: { voltage: number; temperature: number },
   prevReadings: Array<{ voltage: number; temperature: number }>,

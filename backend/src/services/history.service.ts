@@ -11,7 +11,6 @@ export async function getSensorHistory(
   const limit = 100;
   const offset = (page - 1) * limit;
 
-  // Count query — cached in Redis for 30s
   const cacheKey = `sensor_history_count:${sensorId}:${from.toISOString()}:${to.toISOString()}`;
   let totalCount: number;
   const cached = await redis.get(cacheKey);

@@ -23,7 +23,6 @@ export async function seedSensors(pool: Pool): Promise<SeedSensor[]> {
     }
   }
 
-  // Batch insert 100 at a time
   const BATCH = 100;
   for (let i = 0; i < sensors.length; i += BATCH) {
     const batch = sensors.slice(i, i + BATCH);

@@ -5,7 +5,6 @@ import { zoneGuard } from '../middleware/zoneGuard';
 
 const router = Router();
 
-// POST /suppressions
 router.post('/', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { sensor_id, start_time, end_time } = req.body;
@@ -33,7 +32,6 @@ router.post('/', authMiddleware, zoneGuard, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// DELETE /suppressions/:id
 router.delete('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const suppId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -50,7 +48,6 @@ router.delete('/:id', authMiddleware, zoneGuard, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// GET /suppressions?sensor_id=...
 router.get('/', authMiddleware, zoneGuard, async (req, res, next) => {
   try {
     const { sensor_id } = req.query;

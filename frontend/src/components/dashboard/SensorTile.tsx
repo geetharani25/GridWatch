@@ -14,7 +14,6 @@ interface SensorTileProps {
 }
 
 export function SensorTile({ sensor }: SensorTileProps) {
-  // Selector-scoped: only re-renders when THIS sensor's state changes
   const status = useAppStore(s => s.sensorStates.get(sensor.id) ?? 'healthy');
   const cfg = statusConfig[status] ?? statusConfig.healthy;
 

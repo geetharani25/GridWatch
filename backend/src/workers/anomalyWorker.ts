@@ -28,7 +28,7 @@ const FETCH_QUERY = `
 
 async function processReading(sensorId: string, timestamp: string): Promise<void> {
   const { rows } = await pool.query(FETCH_QUERY, [sensorId, timestamp]);
-  if (!rows[0] || rows[0].voltage_min === undefined) return; // no config, skip
+  if (!rows[0] || rows[0].voltage_min === undefined) return;
 
   const row = rows[0];
   const suppressed = !!row.suppression_id;
@@ -74,7 +74,6 @@ async function processReading(sensorId: string, timestamp: string): Promise<void
     }
   }
 
-  // Update sensor status
   if (anomalyRules.length === 0) newStatus = 'healthy';
   if (newStatus !== row.current_status) {
     await pool.query('UPDATE sensors SET status = $1 WHERE id = $2', [newStatus, sensorId]);
@@ -97,7 +96,7 @@ export async function startAnomalyWorker(): Promise<void> {
       );
     } catch (err) {
       logger.error({ err }, 'Anomaly worker error');
-      await new Promise(r => setTimeout(r, 1000)); // brief pause on error
+      await new Promise(r => setTimeout(r, 1000));
     }
   }
 }

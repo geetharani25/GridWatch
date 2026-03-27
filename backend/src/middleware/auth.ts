@@ -4,7 +4,6 @@ import { config } from '../config';
 import { JWTPayload } from '../types/user';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
-  // Support token from Authorization header OR query param (needed for EventSource/SSE)
   const header = req.headers.authorization;
   const queryToken = req.query.token as string | undefined;
   const raw = header?.startsWith('Bearer ') ? header.slice(7) : queryToken;
