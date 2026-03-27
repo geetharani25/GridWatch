@@ -24,6 +24,8 @@ That's it. The seed container runs automatically and populates the database with
 ---
 
 ## Architecture
+Here is the flow chart diagram of complete process
+<img width="800" height="646" alt="flow" src="https://github.com/user-attachments/assets/8c47aff1-440e-4542-817e-053fe6b85412" />
 
 ```
 Browser
@@ -324,8 +326,3 @@ The history endpoint achieves 29ms via the `(sensor_id, timestamp DESC)` index, 
 | operator_b@gridwatch.test | GridWatch2026! | operator | Zones B + C |
 
 Seeded scenarios include 50 threshold breach sensors, 20 silent sensor candidates, 10 active suppressions, 5 escalatable critical alerts (opened >5 min ago), 3 acknowledged alerts, and 2 resolved alerts.
-
-
-Here is the flow chart diagram of complete process
-<img width="800" height="646" alt="flow" src="https://github.com/user-attachments/assets/8c47aff1-440e-4542-817e-053fe6b85412" />
-
